@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#655074',
     marginRight:20,
-    marginTop: 20,
     marginBottom: 10,
   },
   card: {

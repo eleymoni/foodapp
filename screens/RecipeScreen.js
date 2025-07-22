@@ -2,11 +2,17 @@ import React, {useState} from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useDispatch, useSelector} from 'react-redux';
+import { toggleFavorite } from '../reducers/favorites';
 
 export default function RecipeScreen({navigation}) {
 
 const route = useRoute(); //Récup l'obj route
 const { recipe } = route.params; // Extrait recette passée en param
+
+const dispatch = useDispatch();
+const favorites = useSelector(state => state.favorites.value);
+const isFavorite = favorites.some(fav => fav.name === recipe.name);
 
 const [servings, setServings] = useState(recipe.servingNb);
 
@@ -14,6 +20,9 @@ const handleBack = () => {
   navigation.goBack();
 }
 
+const handleFav = () => {
+  dispatch(toggleFavorite(recipe));
+}
 
   return (
     <View style={[styles.container, {backgroundColor: recipe.color}]}>
@@ -23,26 +32,28 @@ const handleBack = () => {
         </TouchableOpacity>
         <Image style={styles.image} source={recipe.image}/>
         <View style={styles.fav}>
-        <FontAwesome name="bookmark-o" size={25} color={'white'}/>
+          <TouchableOpacity onPress={handleFav} style={styles.fabBtn}>
+            <FontAwesome name={isFavorite ? "bookmark" : "bookmark-o"} size={25} color={'white'}/>
+          </TouchableOpacity>
         </View>
       </View>
       <View style={styles.recipe}>
         <View style={styles.infos}>
+          <View style={styles.petitesInfos}>
+          <FontAwesome name="tachometer" size={30} color={recipe.color} />
+            <Text>{recipe.level}</Text>
+          </View>
         <View style={styles.petitesInfos}>
-        <FontAwesome name="tachometer" size={30} color={recipe.color} />
-          <Text>{recipe.level}</Text>
-        </View>
-        <View style={styles.petitesInfos}>
-        <FontAwesome name="clock-o" size={30} color={recipe.color} />
+          <FontAwesome name="clock-o" size={30} color={recipe.color} />
           <Text>{recipe.time}</Text>
         </View>
         <View style={styles.petitesInfos}>
-        <FontAwesome name="star" size={30} color={recipe.color} />
+          <FontAwesome name="star" size={30} color={recipe.color} />
           <Text>{recipe.rating}</Text>
         </View>
         </View>
         <View style={styles.title}>
-          <Text style={{fontSize: 30, fontWeight:'bold'}}>{recipe.name}</Text>
+          <Text style={{fontSize: 30, fontWeight:'bold', marginTop:-25, marginBottom:8,}}>{recipe.name}</Text>
           <Text>{recipe.longDesc}</Text>
         </View>
         <View style={{marginTop: 20}}>
@@ -84,22 +95,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   card: {
-    height: 430,
+    height: 350,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: -20,
   },
   image: {
     width: 230,
     height: 230,
     borderRadius: 8,
-   
+    marginBottom: 40,
   },
   recipe: {
     flex: 1,
     width: '100%',
-    borderTopRightRadius: 190,
+    borderTopRightRadius: 160,
     backgroundColor: 'white',
     marginTop: -70,
     overflow: 'hidden',
@@ -121,7 +131,7 @@ const styles = StyleSheet.create({
   },
   fav:{
     position: 'absolute',
-    bottom: 30,
+    bottom: 60,
     right: 30,
     backgroundColor: '#655074',
     height: 55,
@@ -132,7 +142,7 @@ const styles = StyleSheet.create({
   },
   ingredients:{
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 5,
   },
   servingControl: {
     flexDirection: 'row',
